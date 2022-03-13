@@ -128,7 +128,7 @@ class NoisyDataset(AbstractDataset):
             noise = np.random.poisson(img)
             noise_img = img + noise
             noise_img = 255 * (noise_img / np.amax(noise_img))
-
+        
         # Normal distribution (default)
         else:
             if self.seed:
@@ -195,7 +195,7 @@ class NoisyDataset(AbstractDataset):
     def _corrupt(self, img):
         """Corrupts images (Gaussian, Poisson, or text overlay)."""
 
-        if self.noise_type in ['gaussian', 'poisson']:
+        if self.noise_type in ['gaussian', 'poisson', 'precomputed']:
             return self._add_noise(img)
         elif self.noise_type == 'text':
             return self._add_text_overlay(img)
@@ -210,13 +210,28 @@ class NoisyDataset(AbstractDataset):
         img_path = os.path.join(self.root_dir, self.imgs[index])
         img =  Image.open(img_path).convert('RGB')
 
+        corrupt_img_path = None
+        corrupt_img =  None
+        img_crops = []
+
+        if self.noise_type == 'precomputed':
+            corrupt_img_path = os.path.join(self.root_dir + "-noisy", self.imgs[index])
+            corrupt_img =  Image.open(corrupt_img_path).convert('RGB')
+
         # Random square crop
         if self.crop_size != 0:
-            img = self._random_crop([img])[0]
+            if self.noise_type == 'precomputed':
+                img_crops = self._random_crop([img, corrupt_img])
+                img = img_crops[0]
+            else:
+                img = self._random_crop([img])[0]
 
         # Corrupt source image
-        tmp = self._corrupt(img)
-        source = tvF.to_tensor(self._corrupt(img))
+        if self.noise_type == 'precomputed':
+            source = tvF.to_tensor(img_crops[1])
+        else:
+            tmp = self._corrupt(img)
+            source = tvF.to_tensor(self._corrupt(img))
 
         # Corrupt target image, but not when clean targets are requested
         if self.clean_targets:

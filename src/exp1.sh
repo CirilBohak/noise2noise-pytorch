@@ -6,8 +6,7 @@ python train.py \
   --nb-epochs 10 \
   --batch-size 4 \
   --loss l2 \
-  --noise-type gaussian \
-  --noise-param 50 \
+  --noise-type precomputed \
   --crop-size 64 \
   --plot-stats \
   --report-interval 1 \
