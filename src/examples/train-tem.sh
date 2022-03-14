@@ -1,0 +1,12 @@
+python3 ../train.py \
+  --train-dir ../../data-tem/train --train-size 500 \
+  --valid-dir ../../data-tem/valid --valid-size 100 \
+  --ckpt-save-path ../../ckpts \
+  --ckpt-overwrite \
+  --report-interval 25 \
+  --nb-epochs 30 \
+  --loss l2 \
+  --noise-type precomputed \
+  --crop-size 128 \
+  --plot-stats \
+  --cuda

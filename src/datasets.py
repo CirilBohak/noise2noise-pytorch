@@ -215,7 +215,10 @@ class NoisyDataset(AbstractDataset):
         img_crops = []
 
         if self.noise_type == 'precomputed':
-            corrupt_img_path = os.path.join(self.root_dir + "-noisy", self.imgs[index])
+            l = len(self.imgs[index])
+            idx = self.imgs[index].index('_')
+            noisy_filename = 'noisy' + self.imgs[index][idx:l]
+            corrupt_img_path = os.path.join(self.root_dir + "-noisy", noisy_filename)
             corrupt_img =  Image.open(corrupt_img_path).convert('RGB')
 
         # Random square crop
